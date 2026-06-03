@@ -1,134 +1,248 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YG-Market</title>
+<title>YG-Market Game Store</title>
 
 <style>
-body{
-    margin:0;
-    font-family:Tahoma,sans-serif;
-    background:#121212;
-    color:white;
+:root{
+  --bg:#0b0f19;
+  --card:#151c2e;
+  --text:#fff;
+  --accent:#7c3aed;
 }
 
-header{
-    background:#1f1f1f;
-    text-align:center;
-    padding:20px;
+body.light{
+  --bg:#f4f4f4;
+  --card:#fff;
+  --text:#111;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* Navbar */
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  background:var(--card);
+  position:sticky;
+  top:0;
 }
 
 .logo{
-    font-size:35px;
-    color:#00ff88;
-    font-weight:bold;
+  font-weight:bold;
+  color:var(--accent);
+  font-size:20px;
 }
 
-.games{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:20px;
-    padding:30px;
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:5px;
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+}
+
+/* Hero */
+.hero{
+  text-align:center;
+  padding:40px 10px;
+}
+
+.hero h1{
+  font-size:32px;
+}
+
+/* Sections */
+.section-title{
+  padding:15px;
+  font-size:20px;
+  color:var(--accent);
+}
+
+/* Products */
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:10px;
+  padding:10px;
 }
 
 .card{
-    background:#1e1e1e;
-    width:250px;
-    border-radius:12px;
-    padding:15px;
-    text-align:center;
-}
-
-.card img{
-    width:100%;
-    border-radius:10px;
+  background:var(--card);
+  padding:15px;
+  border-radius:10px;
+  text-align:center;
 }
 
 .price{
-    color:#00ff88;
-    font-size:22px;
-    margin:10px 0;
+  color:var(--accent);
+  margin:10px 0;
+  font-weight:bold;
 }
 
-.btn{
-    display:inline-block;
-    background:#00ff88;
-    color:black;
-    text-decoration:none;
-    padding:10px 20px;
-    border-radius:8px;
-    font-weight:bold;
+/* Cart */
+.cart{
+  position:fixed;
+  right:10px;
+  top:80px;
+  background:var(--card);
+  padding:10px;
+  width:220px;
+  border-radius:10px;
+  font-size:13px;
 }
 
-footer{
-    text-align:center;
-    padding:20px;
-    background:#1f1f1f;
+/* Responsive */
+@media(max-width:768px){
+  .cart{position:static;width:95%;margin:10px;}
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <div class="logo">YG-Market 🎮</div>
-    <p>أفضل أسعار الألعاب والحسابات</p>
-</header>
+<nav>
+  <div class="logo">YG-Market</div>
+  <button onclick="toggleTheme()">Dark/Light</button>
+</nav>
 
-<section class="games">
-
-<div class="card">
-    <img src="https://via.placeholder.com/250x140" alt="GTA V">
-    <h2>GTA V</h2>
-    <div class="price">610 جنيه</div>
-    <a href="#" class="btn">شراء</a>
+<div class="hero">
+  <h1>🎮 YG-Market Game Store</h1>
+  <p>أحدث الأسعار المتوفرة حالياً</p>
 </div>
 
-<div class="card">
-    <img src="https://via.placeholder.com/250x140" alt="Minecraft">
-    <h2>Minecraft</h2>
-    <div class="price">550 جنيه</div>
-    <a href="#" class="btn">شراء</a>
-</div>
-
-<div class="card">
-    <img src="https://via.placeholder.com/250x140" alt="Red Dead Redemption 2">
-    <h2>Red Dead Redemption 2</h2>
-    <div class="price">595 جنيه</div>
-    <a href="#" class="btn">شراء</a>
-</div>
-
-</section>
-
-<footer>
-    © 2026 YG-Market - جميع الحقوق محفوظة
-</footer>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YG-Market</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<header>
-    <h1>🎮 YG-Market</h1>
-    <input type="text" id="search" placeholder="ابحث عن لعبة...">
-</header>
+<div id="store"></div>
 
 <div class="cart">
-    🛒 السلة: <span id="cart-count">0</span>
+  <b>🛒 Cart</b>
+  <div id="cartItems">Empty</div>
+  <hr>
+  Total: <span id="total">0</span> EGP
 </div>
 
-<section class="products" id="products"></section>
+<script>
+let cart = [];
 
-<script src="script.js"></script>
+let data = {
+  "FC Series":[
+    ["FC 26",665],
+    ["FC 26 ICONS Edition",835],
+    ["FC 26 Ultimate Edition",1375]
+  ],
+  "AAA Games":[
+    ["GTA V",665],
+    ["Red Dead Redemption 2",595],
+    ["RDR2 Ultimate",835],
+    ["Forza Horizon 5",835],
+    ["Forza Horizon 6",2135],
+    ["Forza Horizon 6 Deluxe",2915],
+    ["Forza Horizon 6 Premium",3775],
+    ["Battlefield 6",1295],
+    ["Battlefield V",215],
+    ["Battlefield 1",215],
+    ["Battlefield 2042",230],
+    ["Rust",495],
+    ["DayZ",845],
+    ["Ready or Not",495],
+    ["Dead by Daylight",350],
+    ["NBA 2K26",445],
+    ["F1 25",945],
+    ["ETS2 + ATS",235]
+  ],
+  "Steam & Others":[
+    ["Minecraft Java & Bedrock",550],
+    ["CS2 Fresh Prime",925],
+    ["FiveM Code",65],
+    ["Split Fiction",775],
+    ["ELDEN RING NIGHTREIGN",875],
+    ["RUST Steam Market",415],
+    ["Valheim",275],
+    ["Subnautica",275],
+    ["Hades",165]
+  ],
+  "Game Pass":[
+    ["10 Months",475],
+    ["8 Months",400],
+    ["7 Months",375],
+    ["6 Months",350],
+    ["5 Months",325],
+    ["4 Months",300],
+    ["3 Months",250],
+    ["75 Days",225],
+    ["2 Months",200],
+    ["1 Month",150]
+  ]
+};
+
+function render(){
+  let store = document.getElementById("store");
+  store.innerHTML = "";
+
+  for(let cat in data){
+    store.innerHTML += `<div class="section-title">${cat}</div><div class="products">`;
+
+    data[cat].forEach((p,i)=>{
+      store.innerHTML += `
+        <div class="card">
+          <h3>${p[0]}</h3>
+          <div class="price">${p[1]} EGP</div>
+          <button onclick="add('${p[0]}',${p[1]})">Add</button>
+        </div>
+      `;
+    });
+
+    store.innerHTML += `</div>`;
+  }
+}
+
+function add(name,price){
+  cart.push({name,price});
+  updateCart();
+}
+
+function updateCart(){
+  let box = document.getElementById("cartItems");
+  let total = document.getElementById("total");
+
+  if(cart.length===0){
+    box.innerHTML="Empty";
+    total.innerText=0;
+    return;
+  }
+
+  let sum=0;
+  box.innerHTML="";
+
+  cart.forEach(i=>{
+    box.innerHTML += `<div>${i.name} - ${i.price}</div>`;
+    sum+=i.price;
+  });
+
+  total.innerText=sum;
+}
+
+function toggleTheme(){
+  document.body.classList.toggle("light");
+}
+
+render();
+updateCart();
+</script>
+
 </body>
 </html>
+<button onclick="buyNow('${p[0]}',${p[1]})">Buy Now</button>
